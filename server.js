@@ -6,7 +6,13 @@ app.set('trust proxy', 1);
 
 app.get('/api/test/live/ip', (req, res) => {
   try {
-    const rawIp = req.ip || req.headers['x-forwarded-for']?.split(',')[0].trim() || req.socket?.remoteAddress || 'Unknown';
+    const rawIp =
+      req.headers['x-forwarded-for']?.split(',')[0].trim() ||
+      req.headers['cf-connecting-ip'] ||
+      req.headers['x-real-ip'] ||
+      req.ip ||
+      req.socket?.remoteAddress ||
+      'Unknown';
     const clientIp = rawIp.startsWith('::ffff:') ? rawIp.slice(7) : rawIp;
 
     const geo = geoip.lookup(clientIp);
